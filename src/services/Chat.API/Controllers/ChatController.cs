@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Chat.API.Controllers
 {
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class ChatController : ControllerBase

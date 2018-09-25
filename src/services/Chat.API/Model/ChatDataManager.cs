@@ -62,15 +62,7 @@ namespace Chat.API.Model
                 QuestionID = questionId
             };
             _context.Answers.Add(answerToBe);
-            if (_context.SaveChanges() == 1)
-            {
-                return AddAnswerToQuestion(answerToBe.ID, questionId);
-            }
-            else
-            {
-                return false;
-            }
-
+            return _context.SaveChanges() == 1;
         }
 
         public bool CreatQuestion(Question questionData)
@@ -142,13 +134,7 @@ namespace Chat.API.Model
         #endregion
 
         #region private
-        private bool AddAnswerToQuestion(int answernId, int questionId)
-        {
-            var question = _context.Questions.SingleOrDefault(q => q.ID == questionId);
-            question.Answer.ID = answernId;
-            return _context.SaveChanges() == 1;
-
-        }
+      
         #endregion private
     }
 }
