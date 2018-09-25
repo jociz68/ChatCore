@@ -22,13 +22,13 @@ namespace Chat.API.Controllers
         }
 
         /// <summary>
-        /// Post api/chat/Add 
+        /// Post api/chat/AddQuestion
         /// </summary>
         /// <param name="question">Content-type application/json</param>
         /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
-        public IActionResult AddChatQuestion([FromBody] Question question)
+        public IActionResult AddQuestion([FromBody] Question question)
         {
             using (_logger.BeginScope("Add Chat Question"))
             {
@@ -58,6 +58,7 @@ namespace Chat.API.Controllers
             return Ok(questions);
         }
 
+        [HttpGet]
         public IActionResult GetQuestionsNotAnswered()
         {
             var questions = _data.GetQuestionsNotAnswered().ToList();
@@ -70,36 +71,6 @@ namespace Chat.API.Controllers
             var retVal = _data.CreateAnswer(answer, questionID);
             return Ok(retVal);
         }
-        // GET api/values
-        [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }
