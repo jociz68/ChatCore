@@ -1,0 +1,153 @@
+﻿@model Entities.Question
+
+
+<div class="row">
+    <div class="col-md-2">
+    </div>
+
+    <div class="col-md-8 current-chat">
+        <div class="row current-chat-area" id="scrollList">
+            <div class="col-md-12">
+                <ul class="media-list" id="questionList">
+                    @* Questions & Answers inserted by LoadData *@
+
+                </ul>
+            </div>
+        </div>
+
+        @using (Html.BeginForm())
+            {
+        @Html.AntiForgeryToken()
+        <div class="row current-chat-footer">
+            <div class="panel-footer">
+                <div class="input-group">
+                    <p>Enter your question</p>
+                    <textarea name="Text" rows="5" cols="60" class="form-control" id="Text" placeholder="Share your opinion about Wookiee Repellent spray"></textarea>
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" id="sender">Send</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+            }
+
+    </div>
+    <div class="col-md-2">
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript">
+
+        $(function () {
+            LoadData();
+            $("#sender").click(function () {
+
+                var question = {};
+                question.Text = $("#Text").val();
+                if (question.Text.trim() === "") {
+                    return;
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: '/Chat/AddChat',
+                    data: addRequestVerificationToken(question),
+
+                    success: function () {
+                        LoadData();
+                        $("#Text").val("");
+                    },
+                    error: function (ex) {
+                        alert("Error while inserting data: " + ex.responseText);
+                    }
+                });
+                return false;
+            });
+        });
+
+
+
+        function RenderChat(item) {
+            var chat = ""
+
+            chat += "<li class='media'>"
+                + "<div class='chat-container'>"
+                + "<p class='customer-color'>Your question</p>"
+                + "<p>"
+                + SanitizeHtml(item.Text)
+                + "</p>"
+                + "<br>"
+                + "<small class='text-muted time-right'>"
+                + ToJavaScriptDate(item.CreateTime).toLocaleString()
+                + "</small >"
+
+
+            chat += "<div class='chat-container darker'>"
+            chat += "<p class='service-color'>Service answer</p>"
+
+
+            if (item.Answer != undefined) {
+
+                chat += "<p>";
+                chat += SanitizeHtml(item.Answer.Text);
+                chat += "</p>";
+                chat += "<small class='text-muted time-left'>"
+                chat += ToJavaScriptDate(item.Answer.AnswerTime).toLocaleString();
+                chat += "</small >"
+
+            }
+            else {
+                chat += " Waiting for answer "
+            }
+            chat += "</div>"
+
+            chat += "</div></li >"
+
+            return chat
+        }
+
+        function LoadData() {
+            var rows = ""
+            $.ajax({
+                type: 'POST',
+                url: '/Chat/GetQuestion',
+                dataType: 'json',
+                data: { id: '' },
+                success: function (data) {
+                    var items = '';
+                    $.each(data, function (i, item) {
+                        rows += RenderChat(item)
+                    });
+                    $('#questionList').html(rows);
+                    document.querySelector("#scrollList").scrollTop = document.querySelector("#scrollList").scrollHeight;
+                },
+                error: function (ex) {
+                    alert("Error while loading data: " + ex.responseText);
+                }
+            });
+            return false;
+        }
+
+
+
+        function addRequestVerificationToken(data) {
+            data.__RequestVerificationToken = $('input[name=__RequestVerificationToken]').val();
+            return data;
+        };
+
+        function ToJavaScriptDate(value) {
+            var pattern = /Date\(([^)]+)\)/;
+            var results = pattern.exec(value);
+            return new Date(parseFloat(results[1]));
+        }
+
+        function SanitizeHtml(item) {
+            return $("<div>").text(item).html();
+        }
+
+        setInterval(LoadData, 5000);
+</script>
+
