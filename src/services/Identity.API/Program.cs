@@ -17,14 +17,18 @@ namespace Identity.API
             CreateWebHostBuilder(args).Build().Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-            .ConfigureLogging((hostingContext, logging) =>
-            {
-                logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
-                logging.AddConsole(options => options.IncludeScopes = true);
-                logging.AddDebug();
-            })
-                .UseStartup<Startup>();
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
+        {
+            var config = new ConfigurationBuilder()
+               .SetBasePath(Directory.GetCurrentDirectory())
+               .AddJsonFile("hosting.json", optional: true)
+               .AddCommandLine(args)
+               .AddEnvironmentVariables()
+               .Build();
+
+            return WebHost.CreateDefaultBuilder(args)
+                    .UseConfiguration(config)
+                    .UseStartup<Startup>();
+        }
     }
 }
