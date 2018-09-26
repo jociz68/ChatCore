@@ -35,6 +35,13 @@ namespace Chat.API
             services.AddSwaggerGen(s =>
             s.SwaggerDoc("v1", new Info { Title = "Chat API", Version = "v1" }));
             services.AddApiVersioning();
+
+            // Automatic EF Update-Database
+            var serviceProvider = services.BuildServiceProvider();
+            using (var context = serviceProvider.GetService<ChatModelCtx>())
+            {
+                context.Database.Migrate();
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

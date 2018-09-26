@@ -25,16 +25,27 @@ namespace Identity.API
 
         public IConfiguration Configuration { get; }
 
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddDbContext<UserModelCtx>(options =>
-       options.UseSqlServer(Configuration.GetValue<string>("ConnectionString")));
-            services.AddTransient<IUserManager,UserDataManager>();
+            {
+                options.UseSqlServer(Configuration.GetValue<string>("ConnectionString"));
+            });
+            services.AddTransient<IUserManager, UserDataManager>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSwaggerGen(s =>
-            s.SwaggerDoc("v1", new Info { Title = "Chat API", Version = "v1" }));
+                s.SwaggerDoc("v1", new Info { Title = "Chat API", Version = "v1" }));
             services.AddApiVersioning();
+
+            // Automatic EF Update-Database
+            var serviceProvider = services.BuildServiceProvider();
+            using (var context = serviceProvider.GetService<UserModelCtx>())
+            {
+                context.Database.Migrate();
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
